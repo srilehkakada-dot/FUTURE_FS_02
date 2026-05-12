@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>LeadFlow CRM</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+</head>
+<body>
+
+  <!-- Toast -->
+  <div id="toast" class="toast"></div>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="nav-brand">
+      <span class="brand-icon"><i class="fa-solid fa-bolt"></i></span>
+      <span class="brand-name">LeadFlow</span>
+      <span class="brand-tag">CRM</span>
+    </div>
+    <div class="nav-right">
+      <div class="stat-chip"><i class="fa-solid fa-circle-dot"></i> <span id="nav-total">0</span> Leads</div>
+      <button class="btn-add-nav" id="openFormBtn"><i class="fa-solid fa-plus"></i> Add Lead</button>
+    </div>
+  </nav>
+
+  <!-- Dashboard Header -->
+  <section class="dashboard-header">
+    <div class="dh-text">
+      <h1>Client Lead Manager</h1>
+      <p>Track, manage and close your pipeline.</p>
+    </div>
+    <div class="stat-cards">
+      <div class="stat-card" data-status="New">
+        <div class="sc-icon new"><i class="fa-solid fa-star"></i></div>
+        <div class="sc-info"><span id="count-new">0</span><small>New</small></div>
+      </div>
+      <div class="stat-card" data-status="Contacted">
+        <div class="sc-icon contacted"><i class="fa-solid fa-phone"></i></div>
+        <div class="sc-info"><span id="count-contacted">0</span><small>Contacted</small></div>
+      </div>
+      <div class="stat-card" data-status="Follow Up">
+        <div class="sc-icon followup"><i class="fa-solid fa-rotate"></i></div>
+        <div class="sc-info"><span id="count-followup">0</span><small>Follow Up</small></div>
+      </div>
+      <div class="stat-card" data-status="Closed">
+        <div class="sc-icon closed"><i class="fa-solid fa-check-circle"></i></div>
+        <div class="sc-info"><span id="count-closed">0</span><small>Closed</small></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Controls -->
+  <section class="controls">
+    <div class="search-wrap">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input type="text" id="searchInput" placeholder="Search by name or company…"/>
+      <button id="clearSearch" title="Clear"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="filter-wrap">
+      <button class="filter-btn active" data-filter="All">All</button>
+      <button class="filter-btn" data-filter="New">New</button>
+      <button class="filter-btn" data-filter="Contacted">Contacted</button>
+      <button class="filter-btn" data-filter="Follow Up">Follow Up</button>
+      <button class="filter-btn" data-filter="Closed">Closed</button>
+    </div>
+    <button class="btn-export" id="exportBtn"><i class="fa-solid fa-download"></i> Export</button>
+  </section>
+
+  <!-- Lead Grid -->
+  <section class="leads-section">
+    <div class="leads-grid" id="leadsGrid"></div>
+    <div class="empty-state" id="emptyState">
+      <i class="fa-solid fa-inbox"></i>
+      <p>No leads found.<br/>Add your first lead!</p>
+    </div>
+  </section>
+
+  <!-- Modal Overlay -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal" id="modal">
+      <div class="modal-header">
+        <h2 id="modalTitle">Add New Lead</h2>
+        <button class="modal-close" id="closeModal"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <form id="leadForm" class="lead-form" novalidate>
+        <input type="hidden" id="editId"/>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Full Name <span>*</span></label>
+            <input type="text" id="fName" placeholder="Jane Doe" required/>
+          </div>
+          <div class="form-group">
+            <label>Company <span>*</span></label>
+            <input type="text" id="fCompany" placeholder="Acme Corp" required/>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Email <span>*</span></label>
+            <input type="email" id="fEmail" placeholder="jane@acme.com" required/>
+          </div>
+          <div class="form-group">
+            <label>Phone</label>
+            <input type="tel" id="fPhone" placeholder="+91 9876543210"/>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Status</label>
+          <div class="status-select">
+            <button type="button" class="status-opt active" data-val="New">New</button>
+            <button type="button" class="status-opt" data-val="Contacted">Contacted</button>
+            <button type="button" class="status-opt" data-val="Follow Up">Follow Up</button>
+            <button type="button" class="status-opt" data-val="Closed">Closed</button>
+          </div>
+          <input type="hidden" id="fStatus" value="New"/>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn-cancel" id="cancelForm">Cancel</button>
+          <button type="submit" class="btn-submit"><i class="fa-solid fa-floppy-disk"></i> Save Lead</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Delete Confirm Modal -->
+  <div class="modal-overlay" id="deleteOverlay">
+    <div class="modal modal-sm">
+      <div class="modal-header">
+        <h2>Delete Lead?</h2>
+        <button class="modal-close" id="closeDelete"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <p class="delete-msg">This action cannot be undone. Are you sure?</p>
+      <div class="form-actions">
+        <button class="btn-cancel" id="cancelDelete">Cancel</button>
+        <button class="btn-danger" id="confirmDelete"><i class="fa-solid fa-trash"></i> Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
